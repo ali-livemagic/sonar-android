@@ -20,10 +20,20 @@
 package org.sonar.plugins.android.lint;
 
 import com.google.common.collect.ImmutableList;
+import org.sonar.api.CoreProperties;
 import org.sonar.api.SonarPlugin;
+import org.sonar.api.Property;
 
 import java.util.List;
 
+@Property( 
+  key = AndroidLintConstants.PROJECT_PATH_PROPERTY,
+  name = "Android project path",
+  description = "Path (relative to the base path) where the Android project resides (i.e. where the AndroidManifest.xml is located).",
+  category = CoreProperties.CATEGORY_JAVA,
+  project = true,
+  global = false
+)
 public class AndroidLintPlugin extends SonarPlugin {
 
   @Override
