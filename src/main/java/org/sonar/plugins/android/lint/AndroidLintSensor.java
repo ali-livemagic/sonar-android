@@ -46,7 +46,7 @@ public class AndroidLintSensor implements Sensor {
 
   @Override
   public void analyse(Project project, SensorContext sensorContext) {
-    executor.execute(sensorContext);
+    executor.execute(sensorContext, project);
   }
 
   @Override

@@ -64,9 +64,10 @@ public class AndroidLintSensorTest {
   @Test
   public void shouldStartExecutor() {
     SensorContext sensorContext = mock(SensorContext.class);
-    sensor.analyse(mock(Project.class), sensorContext);
+    Project project = mock(Project.class);
+    sensor.analyse(project, sensorContext);
 
-    verify(executor).execute(sensorContext);
+    verify(executor).execute(sensorContext, project);
 
     // To improve coverage
     assertThat(sensor.toString()).isEqualTo("AndroidLintSensor");
