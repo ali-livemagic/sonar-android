@@ -20,16 +20,19 @@
 package org.sonar.plugins.android.lint;
 
 import com.android.SdkConstants;
+import com.google.common.collect.Lists;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Matchers;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.config.Settings;
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
 import org.sonar.api.rules.ActiveRule;
+import org.sonar.api.scan.filesystem.FileQuery;
 import org.sonar.api.scan.filesystem.ModuleFileSystem;
 
 import java.io.File;
@@ -81,40 +84,39 @@ public class AndroidLintSensorTest {
     when(fs.baseDir()).thenReturn(basedir);
 
     Project project = mock(Project.class);
-    when(project.getLanguageKey()).thenReturn("cobol");
-    assertThat(sensor.shouldExecuteOnProject(project)).isEqualTo(false);
-    when(project.getLanguageKey()).thenReturn("java");
-    assertThat(sensor.shouldExecuteOnProject(project)).isEqualTo(true);
+    when(fs.files(Matchers.<FileQuery>any())).thenReturn(Collections.emptyList(), Lists.newArrayList(new File("MyClass.java")));
+    assertThat(sensor.shouldExecuteOnProject(project)).isFalse();
+    assertThat(sensor.shouldExecuteOnProject(project)).isTrue();
   }
 
   @Test
   public void shouldOnlyRunOnAndroidModules() throws Exception {
     Project project = mock(Project.class);
-    when(project.getLanguageKey()).thenReturn("java");
+    when(fs.files(Matchers.<FileQuery>any())).thenReturn(Lists.newArrayList(new File("MyClass.java")));
     when(rulesProfile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
 
     File basedir = temp.newFolder();
     when(fs.baseDir()).thenReturn(basedir);
 
-    assertThat(sensor.shouldExecuteOnProject(project)).isEqualTo(false);
+    assertThat(sensor.shouldExecuteOnProject(project)).isFalse();
 
     new File(basedir, SdkConstants.ANDROID_MANIFEST_XML).createNewFile();
-    assertThat(sensor.shouldExecuteOnProject(project)).isEqualTo(true);
+    assertThat(sensor.shouldExecuteOnProject(project)).isTrue();
   }
 
   @Test
   public void shouldNotRunIfNoAndroidRule() throws Exception {
     Project project = mock(Project.class);
-    when(project.getLanguageKey()).thenReturn("java");
+    when(fs.files(Matchers.<FileQuery>any())).thenReturn(Lists.newArrayList(new File("MyClass.java")));
     File basedir = temp.newFolder();
     when(fs.baseDir()).thenReturn(basedir);
     new File(basedir, SdkConstants.ANDROID_MANIFEST_XML).createNewFile();
 
     when(rulesProfile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY)).thenReturn(Collections.emptyList());
-    assertThat(sensor.shouldExecuteOnProject(project)).isEqualTo(false);
+    assertThat(sensor.shouldExecuteOnProject(project)).isFalse();
 
     when(rulesProfile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
-    assertThat(sensor.shouldExecuteOnProject(project)).isEqualTo(true);
+    assertThat(sensor.shouldExecuteOnProject(project)).isTrue();
   }
 
   @Test
@@ -122,7 +124,7 @@ public class AndroidLintSensorTest {
     String projectPath = "AndroidProject";
 
     Project project = mock(Project.class);
-    when(project.getLanguageKey()).thenReturn("java");
+    when(fs.files(Matchers.<FileQuery>any())).thenReturn(Lists.newArrayList(new File("MyClass.java")));
     when(rulesProfile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
 
     Settings settings = new Settings();

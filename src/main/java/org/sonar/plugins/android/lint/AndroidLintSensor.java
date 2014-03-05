@@ -24,8 +24,8 @@ import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.config.Settings;
 import org.sonar.api.profiles.RulesProfile;
-import org.sonar.api.resources.Java;
 import org.sonar.api.resources.Project;
+import org.sonar.api.scan.filesystem.FileQuery;
 import org.sonar.api.scan.filesystem.ModuleFileSystem;
 
 import java.io.File;
@@ -56,9 +56,9 @@ public class AndroidLintSensor implements Sensor {
     if (projectRelPath != null) {
       projectFullPath += "/" + projectRelPath;
     }
-    return Java.KEY.equals(project.getLanguageKey())
-      && !profile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY).isEmpty()
-      && new File(projectFullPath, SdkConstants.ANDROID_MANIFEST_XML).exists();
+    return !fs.files(FileQuery.onSource().onLanguage("java")).isEmpty()
+        && !profile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY).isEmpty()
+        && new File(projectFullPath, SdkConstants.ANDROID_MANIFEST_XML).exists();
   }
 
   @Override
