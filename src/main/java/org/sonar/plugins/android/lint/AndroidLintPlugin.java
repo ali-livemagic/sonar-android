@@ -29,12 +29,14 @@ import java.util.List;
 
 public class AndroidLintPlugin extends SonarPlugin {
 
+  public static final String PROJECT_PATH_PROPERTY = "sonar.androidLint.projectPath";
+
   private static final String SETTINGS_CATEGORY_NAME = "Android Lint";
 
   @Override
-  public List<?> getExtensions() {
+  public List getExtensions() {
     return ImmutableList.of(
-        PropertyDefinition.builder(AndroidLintConstants.PROJECT_PATH_PROPERTY)
+        PropertyDefinition.builder(PROJECT_PATH_PROPERTY)
             .category(SETTINGS_CATEGORY_NAME)
             .subCategory(SETTINGS_CATEGORY_NAME)
             .name("Android project path")

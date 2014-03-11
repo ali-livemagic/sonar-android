@@ -33,8 +33,11 @@ import java.io.File;
 public class AndroidLintSensor implements Sensor {
 
   private RulesProfile profile;
+
   private AndroidLintExecutor executor;
+
   private ModuleFileSystem fs;
+
   private Settings settings;
 
   public AndroidLintSensor(RulesProfile profile, AndroidLintExecutor executor, ModuleFileSystem fs, Settings settings) {
@@ -52,12 +55,12 @@ public class AndroidLintSensor implements Sensor {
   @Override
   public boolean shouldExecuteOnProject(Project project) {
     String projectFullPath = fs.baseDir().getPath();
-    String projectRelPath = settings.getString(AndroidLintConstants.PROJECT_PATH_PROPERTY);
+    String projectRelPath = settings.getString(AndroidLintPlugin.PROJECT_PATH_PROPERTY);
     if (projectRelPath != null) {
       projectFullPath += "/" + projectRelPath;
     }
     return !fs.files(FileQuery.onSource().onLanguage("java")).isEmpty()
-        && !profile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY).isEmpty()
+        && !profile.getActiveRulesByRepository(AndroidLintRuleRepository.REPOSITORY_KEY).isEmpty()
         && new File(projectFullPath, SdkConstants.ANDROID_MANIFEST_XML).exists();
   }
 

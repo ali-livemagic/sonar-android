@@ -20,7 +20,6 @@
 package org.sonar.plugins.android.lint;
 
 import com.google.common.collect.Lists;
-import org.sonar.api.resources.Java;
 import org.sonar.api.rules.Rule;
 import org.sonar.api.rules.RuleRepository;
 import org.sonar.api.rules.XMLRuleParser;
@@ -35,10 +34,12 @@ import java.util.List;
  */
 public final class AndroidLintRuleRepository extends RuleRepository {
   private final XMLRuleParser xmlRuleParser;
+  public static final String REPOSITORY_KEY = "android-lint";
+  public static final String REPOSITORY_NAME = "Android Lint";
 
   public AndroidLintRuleRepository(XMLRuleParser xmlRuleParser) {
-    super(AndroidLintConstants.REPOSITORY_KEY, Java.KEY);
-    setName(AndroidLintConstants.REPOSITORY_NAME);
+    super(REPOSITORY_KEY, "java");
+    setName(REPOSITORY_NAME);
     this.xmlRuleParser = xmlRuleParser;
   }
 

@@ -47,7 +47,6 @@ import static org.fest.assertions.Assertions.assertThat;
  * This class tests the AndroidLintRuleRepository class
  *
  * @author Florian Roncari
- *
  */
 public class AndroidLintRuleRepositoryTest {
 
@@ -109,7 +108,7 @@ public class AndroidLintRuleRepositoryTest {
 
   /**
    * Convert Android Lint {@link Severity} to Sonar {@link RulePriority}
-   *
+   * <p/>
    * Default mapping:
    * |------------------------|
    * | Android     | Sonar    |

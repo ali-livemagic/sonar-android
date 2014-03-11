@@ -20,6 +20,9 @@
 package org.sonar.plugins.android.lint;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.profiles.XMLProfileParser;
 import org.sonar.api.rules.Rule;
@@ -37,7 +40,14 @@ public class AndroidLintSonarWayTest {
   @Test
   public void createSonarWayTest() {
     RuleFinder ruleFinder = mock(RuleFinder.class);
-    when(ruleFinder.findByKey(eq(AndroidLintConstants.REPOSITORY_KEY), anyString())).thenReturn(Rule.create());
+    when(ruleFinder.findByKey(eq(AndroidLintRuleRepository.REPOSITORY_KEY), anyString()))
+        .thenAnswer(new Answer<Rule>() {
+          @Override
+          public Rule answer(InvocationOnMock invocation) throws Throwable {
+            return Rule.create(AndroidLintRuleRepository.REPOSITORY_KEY, (String) invocation.getArguments()[1], (String) invocation.getArguments()[1]);
+          }
+        }
+        );
     AndroidLintSonarWay sonarWay = new AndroidLintSonarWay(new XMLProfileParser(ruleFinder));
 
     RulesProfile profile = sonarWay.createProfile(ValidationMessages.create());

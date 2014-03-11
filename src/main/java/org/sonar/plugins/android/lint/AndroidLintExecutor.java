@@ -44,11 +44,11 @@ import org.sonar.api.batch.ProjectClasspath;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.config.Settings;
 import org.sonar.api.profiles.RulesProfile;
+import org.sonar.api.resources.Resource;
 import org.sonar.api.rules.Rule;
 import org.sonar.api.rules.RuleFinder;
 import org.sonar.api.rules.Violation;
 import org.sonar.api.scan.filesystem.ModuleFileSystem;
-import org.sonar.api.scan.filesystem.PathResolver;
 import org.sonar.api.utils.SonarException;
 import org.sonar.api.utils.TimeProfiler;
 
@@ -68,15 +68,13 @@ public class AndroidLintExecutor extends LintClient implements BatchExtension {
   private RuleFinder ruleFinder;
   private RulesProfile rulesProfile;
   private ProjectClasspath projectClasspath;
-  private PathResolver resolver;
   private Settings settings;
 
-  public AndroidLintExecutor(RuleFinder ruleFinder, ModuleFileSystem fs, RulesProfile rulesProfile, ProjectClasspath projectClasspath, PathResolver resolver, Settings settings) {
+  public AndroidLintExecutor(RuleFinder ruleFinder, ModuleFileSystem fs, RulesProfile rulesProfile, ProjectClasspath projectClasspath, Settings settings) {
     this.ruleFinder = ruleFinder;
     this.fs = fs;
     this.rulesProfile = rulesProfile;
     this.projectClasspath = projectClasspath;
-    this.resolver = resolver;
     this.settings = settings;
   }
 
@@ -84,7 +82,7 @@ public class AndroidLintExecutor extends LintClient implements BatchExtension {
     this.sensorContext = sensorContext;
     this.project = project;
     String projectFullPath = fs.baseDir().getPath();
-    String projectRelPath = settings.getString(AndroidLintConstants.PROJECT_PATH_PROPERTY);
+    String projectRelPath = settings.getString(AndroidLintPlugin.PROJECT_PATH_PROPERTY);
     if (projectRelPath != null) {
       projectFullPath += "/" + projectRelPath;
     }
@@ -103,7 +101,7 @@ public class AndroidLintExecutor extends LintClient implements BatchExtension {
 
       @Override
       public boolean isEnabled(Issue issue) {
-        return rulesProfile.getActiveRule(AndroidLintConstants.REPOSITORY_KEY, issue.getId()) != null;
+        return rulesProfile.getActiveRule(AndroidLintRuleRepository.REPOSITORY_KEY, issue.getId()) != null;
       }
 
       @Override
@@ -133,17 +131,17 @@ public class AndroidLintExecutor extends LintClient implements BatchExtension {
   }
 
   private Violation createViolation(Location location, Rule rule) {
-    Violation violation;
+    Resource resource;
     if (location.getFile().isDirectory()) {
-      violation = Violation.create(rule, new org.sonar.api.resources.Directory(getRelativePath(location.getFile())));
+      resource = org.sonar.api.resources.Directory.fromIOFile(location.getFile(), project);
     } else {
-      violation = Violation.create(rule, org.sonar.api.resources.File.fromIOFile(location.getFile(), project));
+      resource = org.sonar.api.resources.File.fromIOFile(location.getFile(), project);
     }
-    return violation;
+    return Violation.create(rule, resource);
   }
 
   private Rule findRule(Issue issue) {
-    Rule rule = ruleFinder.findByKey(AndroidLintConstants.REPOSITORY_KEY, issue.getId());
+    Rule rule = ruleFinder.findByKey(AndroidLintRuleRepository.REPOSITORY_KEY, issue.getId());
     if (rule == null) {
       throw new SonarException("No Android Lint rule for key " + issue.getId());
     }
@@ -151,10 +149,6 @@ public class AndroidLintExecutor extends LintClient implements BatchExtension {
       throw new SonarException("Android Lint rule with key " + issue.getId() + " disabled");
     }
     return rule;
-  }
-
-  private String getRelativePath(File file) {
-    return fs.baseDir().toURI().relativize(file.toURI()).getPath();
   }
 
   @Override
@@ -201,7 +195,7 @@ public class AndroidLintExecutor extends LintClient implements BatchExtension {
       }
       if (!hasExistingBinaryDir) {
         throw new SonarException("Android Lint needs sources to be compiled. "
-          + "Please build project before executing SonarQube and check the location of compiled classes.");
+            + "Please build project before executing SonarQube and check the location of compiled classes.");
       }
 
       for (File file : projectClasspath.getElements()) {

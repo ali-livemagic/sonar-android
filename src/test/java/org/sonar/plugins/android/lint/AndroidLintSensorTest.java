@@ -78,7 +78,7 @@ public class AndroidLintSensorTest {
 
   @Test
   public void shouldOnlyRunOnJavaModules() throws Exception {
-    when(rulesProfile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
+    when(rulesProfile.getActiveRulesByRepository(AndroidLintRuleRepository.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
     File basedir = temp.newFolder();
     new File(basedir, SdkConstants.ANDROID_MANIFEST_XML).createNewFile();
     when(fs.baseDir()).thenReturn(basedir);
@@ -93,7 +93,7 @@ public class AndroidLintSensorTest {
   public void shouldOnlyRunOnAndroidModules() throws Exception {
     Project project = mock(Project.class);
     when(fs.files(Matchers.<FileQuery>any())).thenReturn(Lists.newArrayList(new File("MyClass.java")));
-    when(rulesProfile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
+    when(rulesProfile.getActiveRulesByRepository(AndroidLintRuleRepository.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
 
     File basedir = temp.newFolder();
     when(fs.baseDir()).thenReturn(basedir);
@@ -112,10 +112,10 @@ public class AndroidLintSensorTest {
     when(fs.baseDir()).thenReturn(basedir);
     new File(basedir, SdkConstants.ANDROID_MANIFEST_XML).createNewFile();
 
-    when(rulesProfile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY)).thenReturn(Collections.emptyList());
+    when(rulesProfile.getActiveRulesByRepository(AndroidLintRuleRepository.REPOSITORY_KEY)).thenReturn(Collections.emptyList());
     assertThat(sensor.shouldExecuteOnProject(project)).isFalse();
 
-    when(rulesProfile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
+    when(rulesProfile.getActiveRulesByRepository(AndroidLintRuleRepository.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
     assertThat(sensor.shouldExecuteOnProject(project)).isTrue();
   }
 
@@ -125,7 +125,7 @@ public class AndroidLintSensorTest {
 
     Project project = mock(Project.class);
     when(fs.files(Matchers.<FileQuery>any())).thenReturn(Lists.newArrayList(new File("MyClass.java")));
-    when(rulesProfile.getActiveRulesByRepository(AndroidLintConstants.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
+    when(rulesProfile.getActiveRulesByRepository(AndroidLintRuleRepository.REPOSITORY_KEY)).thenReturn(Arrays.asList(new ActiveRule()));
 
     Settings settings = new Settings();
     settings.setProperty("sonar.androidLint.projectPath", projectPath);

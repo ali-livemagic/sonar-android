@@ -32,13 +32,14 @@ public enum AndroidLintVersion {
   private static final String PROPERTIES_PATH = "/org/sonar/plugins/android/lint/android-plugin.properties";
   private String version;
 
+  private AndroidLintVersion() {
+    this.version = readVersion(PROPERTIES_PATH);
+  }
+
   public static String getVersion() {
     return INSTANCE.version;
   }
 
-  private AndroidLintVersion() {
-    this.version = readVersion(PROPERTIES_PATH);
-  }
 
   @VisibleForTesting
   static String readVersion(String propertyPath) {
